@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>oss文件上传</title>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/1.11.2/jquery.js"></script>
+    <script>
+        function uploadFile() {
+            $("#fileTypeError").html('');
+            var fileName = $('#file_upload').val();　　　　　　　　　　　　　　　
+            var fileType = fileName.substr(fileName.length - 4, fileName.length);
+            if (fileType == '.bmp' || fileType == '.jpg' || fileType === 'jpeg' || fileType == '.gif' || fileType == '.png') {
+                $.ajax({
+                    url: 'file/upload',
+                    type: 'POST',
+                    cache: false,
+                    data: new FormData($('#uploadForm')[0]),
+                    processData: false,
+                    contentType: false,
+                    success: function (rtn) {
+                        if (rtn.status == 'error') {
+                            $("#fileTypeError").html('*上传文件类型错误,支持类型:  .bmp .jpg .jpeg .gif .png');
+                        } else {
+                            $('div').append('<img src="' + rtn.name + '" style="width: 300px;height: 300px"></img>')
+                        }
+                    }
+                });
+            } else {
+                $("#fileTypeError").html('*上传文件类型错误,支持类型: .bmp .jpg .jpeg .gif .png');
+            }
+        }
+    </script>
+</head>
+<body>
+<form id="uploadForm" enctype="multipart/form-data">　
+    <input id="file_upload" type="file" name="file"/>　
+    <br/><span style="color: #ee0a0a" id="fileTypeError"></span>
+    <br/><input type="button" onclick="uploadFile()" value="上传">
+</form>
+<div></div>
+</body>
+</html>
