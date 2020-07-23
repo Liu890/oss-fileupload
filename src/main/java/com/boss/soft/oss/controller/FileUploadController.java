@@ -1,5 +1,6 @@
 package com.boss.soft.oss.controller;
 
+import com.aliyun.oss.model.OSSObjectSummary;
 import com.boss.soft.oss.service.impl.FileUploadServiceImpl;
 import com.boss.soft.oss.entity.FileUploadResult;
 import org.springframework.stereotype.Controller;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author ljx
@@ -30,6 +32,11 @@ public class FileUploadController {
             throws Exception {
 
         return this.fileUploadService.upload(uploadFile);
+    }
+    @RequestMapping("/list")
+    @ResponseBody
+    public List<OSSObjectSummary> list() throws Exception {
+        return this.fileUploadService.list();
     }
 
     @RequestMapping("/delete")

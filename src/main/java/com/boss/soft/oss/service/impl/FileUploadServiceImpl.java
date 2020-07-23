@@ -1,7 +1,10 @@
 package com.boss.soft.oss.service.impl;
 
 import com.aliyun.oss.OSS;
+import com.aliyun.oss.model.ListObjectsRequest;
 import com.aliyun.oss.model.OSSObject;
+import com.aliyun.oss.model.OSSObjectSummary;
+import com.aliyun.oss.model.ObjectListing;
 import com.boss.soft.oss.config.AliyunConfig;
 import com.boss.soft.oss.entity.FileUploadResult;
 import org.apache.commons.lang3.RandomUtils;
@@ -14,6 +17,7 @@ import java.io.BufferedOutputStream;
 import java.io.OutputStream;
 import java.io.IOException;
 import java.io.ByteArrayInputStream;
+import java.util.List;
 
 /**
  * @author ljx
@@ -74,7 +78,12 @@ public class FileUploadServiceImpl implements com.boss.soft.oss.service.FileUplo
                 RandomUtils.nextInt(100, 9999) + "." +
                 StringUtils.substringAfterLast(sourceFileName, ".");
     }
-
+    public List<OSSObjectSummary> list() {
+        final int maxKeys = 200;
+        ObjectListing objectListing = ossClient.listObjects(new ListObjectsRequest(aliyunConfig.getBucketName()).withMaxKeys(maxKeys));
+        List<OSSObjectSummary> sums = objectListing.getObjectSummaries();
+        return sums;
+    }
 
     @Override
     public FileUploadResult delete(String objectName) {

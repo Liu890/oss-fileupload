@@ -28,7 +28,7 @@ public class AliyunConfig {
     private String urlPrefix;
 
     @Bean
-    public OSS oSSClient() {
+    public OSS ossClient() {
         return new OSSClient(endpoint, accessKeyId, accessKeySecret);
     }
 }
