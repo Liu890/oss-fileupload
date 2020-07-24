@@ -30,7 +30,7 @@ public class FileUploadController {
     @ResponseBody
     public FileUploadResult upload(@RequestParam("file") MultipartFile uploadFile)
             throws Exception {
-
+        System.out.println("upload file:"+uploadFile);
         return this.fileUploadService.upload(uploadFile);
     }
     @RequestMapping("/list")
