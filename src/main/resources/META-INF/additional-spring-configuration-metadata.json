@@ -1,0 +1,18 @@
+{
+  "properties": [
+    {
+      "name": "task.pool.corePoolSize",
+      "type": "java.lang.String",
+      "description": "Description for task.pool.corePoolSize."
+    },
+    {
+      "name": "task.pool.maxPoolSize",
+      "type": "java.lang.String",
+      "description": "Description for task.pool.maxPoolSize."
+    },
+    {
+      "name": "task.pool.keepAliveSeconds",
+      "type": "java.lang.String",
+      "description": "Description for task.pool.keepAliveSeconds."
+    }
+  ] }

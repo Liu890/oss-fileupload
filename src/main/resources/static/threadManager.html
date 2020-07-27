@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>oss文件管理</title>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/1.11.2/jquery.js"></script>
+    <script type="text/javascript">
+        var pre = 'http://bosi-mytask.oss-cn-beijing.aliyuncs.com/';
+        $(function () {
+            listFile();
+        });
+
+        function listFile() {
+            $.ajax({
+                url: "http://localhost:8080/thread/list",
+                type: 'POST',
+                success: function (rtn) {
+                    console.log(rtn.length);
+                    for (var i = 0; i < rtn.length; i++) {
+                        $('div').append('<img src="' + pre + rtn[i].key + '" style="width: 300px;height: 300px; padding: 10px" ondblclick="deleteFile(this.src)" onclick="downloadFile(this.src)"></img>')
+                    }
+                }
+            });
+        }
+
+        function downloadFile(src) {
+
+            var fileName = src.split(pre)[1];
+            window.location.href = "http://localhost:8080/thread/download?fileName=" + fileName;
+        }
+
+        function deleteFile(src) {
+            var fileName = src.split(pre)[1];
+            var param = {fileName: fileName};
+            $.ajax({
+                url: "http://localhost:8080/thread/delete",
+                data: param,
+                success: function () {
+                    alert('删除成功', fileName);
+                    location.reload();
+                }
+            });
+        }
+
+    </script>
+</head>
+<body>
+单击下载oss上的图片、双击删除oss上的图片<br>
+<div>
+
+</div>
+</body>
+</html>>

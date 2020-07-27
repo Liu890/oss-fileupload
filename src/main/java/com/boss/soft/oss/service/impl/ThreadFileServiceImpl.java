@@ -2,14 +2,17 @@ package com.boss.soft.oss.service.impl;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.model.ListObjectsRequest;
-import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.OSSObjectSummary;
 import com.aliyun.oss.model.ObjectListing;
 import com.boss.soft.oss.config.AliyunConfig;
 import com.boss.soft.oss.entity.FileUploadResult;
+import com.boss.soft.oss.service.ThreadFileService;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedInputStream;
@@ -21,20 +24,18 @@ import java.util.List;
 
 /**
  * @author ljx
- * @date 2020/7/23 10:58
+ * @date 2020/7/27 11:41
  */
 @Service
-public class FileUploadServiceImpl implements com.boss.soft.oss.service.FileUploadService {
+public class ThreadFileServiceImpl implements ThreadFileService {
 
     private static final String[] IMAGE_TYPE = new String[]{".bmp", ".jpg",
             ".jpeg", ".gif", ".png"};
 
+    @Autowired
     private OSS ossClient;
-
     private AliyunConfig aliyunConfig;
-
-    public FileUploadServiceImpl(OSS ossClient, AliyunConfig aliyunConfig) {
-        this.ossClient = ossClient;
+    public ThreadFileServiceImpl( AliyunConfig aliyunConfig) {
         this.aliyunConfig = aliyunConfig;
     }
 
@@ -69,36 +70,9 @@ public class FileUploadServiceImpl implements com.boss.soft.oss.service.FileUplo
         return fileUploadResult;
     }
 
-    private String getFilePath(String sourceFileName) {
-        DateTime dateTime = new DateTime();
-        return "images/" + dateTime.toString("yyyy")
-                + "/" + dateTime.toString("MM") + "/"
-                + dateTime.toString("dd") + "/" + System.currentTimeMillis() +
-                RandomUtils.nextInt(100, 9999) + "." +
-                StringUtils.substringAfterLast(sourceFileName, ".");
-    }
-
-    public List<OSSObjectSummary> list() {
-        final int maxKeys = 200;
-        ObjectListing objectListing = ossClient.listObjects(new ListObjectsRequest(aliyunConfig.getBucketName()).withMaxKeys(maxKeys));
-        List<OSSObjectSummary> sums = objectListing.getObjectSummaries();
-        return sums;
-    }
-
-    @Override
-    public FileUploadResult delete(String objectName) {
-        ossClient.deleteObject(aliyunConfig.getBucketName(), objectName);
-        FileUploadResult fileUploadResult = new FileUploadResult();
-        fileUploadResult.setName(objectName);
-        fileUploadResult.setStatus("removed");
-        fileUploadResult.setResponse("success");
-        return fileUploadResult;
-    }
-
     @Override
     public void exportOssFile(OutputStream os, String objectName) throws IOException {
-        OSSObject ossObject = ossClient.getObject(aliyunConfig.getBucketName(), objectName);
-        BufferedInputStream in = new BufferedInputStream(ossObject.getObjectContent());
+        BufferedInputStream in = new BufferedInputStream( ossClient.getObject(aliyunConfig.getBucketName(), objectName).getObjectContent());
         BufferedOutputStream out = new BufferedOutputStream(os);
         byte[] buffer = new byte[1024];
         int length = 0;
@@ -112,6 +86,33 @@ public class FileUploadServiceImpl implements com.boss.soft.oss.service.FileUplo
         if (in != null) {
             in.close();
         }
+    }
+
+    @Override
+    public FileUploadResult delete(String objectName) {
+        ossClient.deleteObject(aliyunConfig.getBucketName(), objectName);
+        FileUploadResult fileUploadResult = new FileUploadResult();
+        fileUploadResult.setName(objectName);
+        fileUploadResult.setStatus("removed");
+        fileUploadResult.setResponse("success");
+        return fileUploadResult;
+    }
+
+    @Override
+    public List<OSSObjectSummary> list() {
+        final int maxKeys = 200;
+        ObjectListing objectListing = ossClient.listObjects(new ListObjectsRequest(aliyunConfig.getBucketName()).withMaxKeys(maxKeys));
+        List<OSSObjectSummary> sums = objectListing.getObjectSummaries();
+        return sums;
+    }
+
+    private String getFilePath(String sourceFileName) {
+        DateTime dateTime = new DateTime();
+        return "images/" + dateTime.toString("yyyy")
+                + "/" + dateTime.toString("MM") + "/"
+                + dateTime.toString("dd") + "/" + System.currentTimeMillis() +
+                RandomUtils.nextInt(100, 9999) + "." +
+                StringUtils.substringAfterLast(sourceFileName, ".");
     }
 
 }
