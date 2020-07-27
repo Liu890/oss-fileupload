@@ -1,10 +1,6 @@
 package com.boss.soft.oss.entity;
 
 import com.boss.soft.oss.config.ThreadConfig;
-import com.boss.soft.oss.service.impl.ThreadFileServiceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -20,12 +16,14 @@ import java.util.concurrent.ThreadPoolExecutor;
 @EnableAsync
 public class TaskExecutorPool {
 
-    @Autowired
-    private ThreadConfig config;
-    private static final Logger logger = LoggerFactory.getLogger(ThreadFileServiceImpl.class);
+    private final ThreadConfig config;
 
-    @Bean
-    public Executor taskExecutorPool() {
+    public TaskExecutorPool(ThreadConfig config) {
+        this.config = config;
+    }
+
+    @Bean("taskExecutor")
+    public Executor getTaskExecutorPool() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(config.getCorePoolSize());
         executor.setMaxPoolSize(config.getMaxPoolSize());
@@ -33,7 +31,6 @@ public class TaskExecutorPool {
         executor.setKeepAliveSeconds(config.getKeepAliveSeconds());
         executor.setThreadNamePrefix("OssExecutor-");
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        logger.info(executor.getThreadNamePrefix());
         executor.initialize();
         return executor;
     }

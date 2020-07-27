@@ -10,9 +10,8 @@ import com.boss.soft.oss.service.ThreadFileService;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedInputStream;
@@ -34,12 +33,11 @@ public class ThreadFileServiceImpl implements ThreadFileService {
 
     @Autowired
     private OSS ossClient;
+    @Autowired
     private AliyunConfig aliyunConfig;
-    public ThreadFileServiceImpl( AliyunConfig aliyunConfig) {
-        this.aliyunConfig = aliyunConfig;
-    }
 
     @Override
+    @Async
     public FileUploadResult upload(MultipartFile uploadFile) {
         boolean isLegal = false;
         for (String type : IMAGE_TYPE) {
@@ -79,16 +77,19 @@ public class ThreadFileServiceImpl implements ThreadFileService {
         while ((length = in.read(buffer)) != -1) {
             out.write(buffer, 0, length);
         }
-        if (out != null) {
+        out.close();
+        in.close();
+        /*if (out != null) {
             out.flush();
             out.close();
         }
         if (in != null) {
             in.close();
-        }
+        }*/
     }
 
     @Override
+    @Async
     public FileUploadResult delete(String objectName) {
         ossClient.deleteObject(aliyunConfig.getBucketName(), objectName);
         FileUploadResult fileUploadResult = new FileUploadResult();
