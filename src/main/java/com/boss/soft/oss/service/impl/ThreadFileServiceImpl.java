@@ -77,15 +77,13 @@ public class ThreadFileServiceImpl implements ThreadFileService {
         while ((length = in.read(buffer)) != -1) {
             out.write(buffer, 0, length);
         }
-        out.close();
-        in.close();
-        /*if (out != null) {
+        if (out != null) {
             out.flush();
             out.close();
         }
         if (in != null) {
             in.close();
-        }*/
+        }
     }
 
     @Override
